@@ -54,14 +54,16 @@ function Books() {
   };
 
   // POST
-  const addBook = (title, pages, published) => {
-    console.log(title, pages, published);
+  const addBook = (title, authors, pages, published, image) => {
+    console.log(title, authors, pages, published, image);
     // completed false = 0, completed true = 1
     axios
       .post("http://localhost:4000/books", {
         title: title,
+        authors: authors,
         pages: pages,
         published: published,
+        image: image,
         review: "",
         completed: 0,
       })
@@ -75,18 +77,27 @@ function Books() {
 
   return (
     <Center display="flex" flexDirection="column">
-      <Box display="flex">
+      <Box display="flex" flexDirection="row">
         <Input
+          width="50%"
           color="white"
           onChange={(e) => setVolumeSearch(e.target.value)}
-          placeholder="Search for book"
+          placeholder="Search for books..."
         ></Input>
         <Input
+          width="50%"
           onChange={(e) => setAuthorSearch(e.target.value)}
           color="white"
-          placeholder="Author"
+          placeholder="Author..."
         ></Input>
-        <Button onClick={search}>Search icon</Button>
+        <Button
+          colorScheme="green"
+          onClick={search}
+          width="max-content"
+          px={10}
+        >
+          Search for books
+        </Button>
       </Box>
       <SimpleGrid
         templateColumns={{ sm: "1fr 1fr", md: "1fr 1fr 1fr 1fr" }}
@@ -96,67 +107,127 @@ function Books() {
         {books.items &&
           books.items.map((book) => (
             <Box
+              backgroundImage={
+                book.volumeInfo.imageLinks &&
+                book.volumeInfo.imageLinks.thumbnail
+              }
+              backgroundSize="cover"
+              backgroundRepeat="no-repeat"
+              m={2}
               key={book.accessInfo.id}
-              border="#48BB78 solid 1px"
+              border="grey solid 2px"
               borderRadius="14px"
               textColor="white"
-              // whiteSpace="nowrap"
               display="flex"
               flexDirection="column"
-              justifyContent="space-between"
-              maxWidth="300px"
-              // textAlign="left"
-              p={4}
+              justifyContent="center"
+              p={2}
+              boxShadow="inner"
+              mx={2}
             >
-              <Text
-                fontSize="1xl"
-                onClick={() => setTitle(book.volumeInfo.title)}
-              >
-                {book.volumeInfo.title}
-              </Text>
-              <Text fontSize="1xl">{book.volumeInfo.averageRating}</Text>
               <Box
+                borderTopRadius="12px"
                 display="flex"
-                flexDirection="column"
-                onClick={() => setAuthor(book.volumeInfo.authors)}
+                flexDir="column"
+                backgroundColor="rgba(0, 0, 0, 0.8)"
               >
-                {book.volumeInfo.authors &&
-                  book.volumeInfo.authors.map((author) => (
-                    <Text fontSize="1xl">{author}</Text>
-                  ))}
+                <Text fontSize="2xl" wordBreak="break-word">
+                  {book.volumeInfo.title.split(" ").slice(0, 0)}
+                </Text>
+                <Text fontSize="2xl" wordBreak="break-word">
+                  {book.volumeInfo.title.split(" ").slice(0, 1)}
+                </Text>
+                <Text fontSize="2xl" wordBreak="break-word">
+                  {book.volumeInfo.title.split(" ").slice(1, 2)}
+                </Text>
+                <Text fontSize="2xl">{book.volumeInfo.averageRating}</Text>
+
+                <Box display="flex" flexDirection="column">
+                  {book.volumeInfo.categories &&
+                    book.volumeInfo.categories.map((category) => (
+                      <Text fontSize="1xl">{category}</Text>
+                    ))}
+                </Box>
               </Box>
-              <Box display="flex" flexDirection="column">
-                {book.volumeInfo.categories &&
-                  book.volumeInfo.categories.map((category) => (
-                    <Text fontSize="1xl">{category}</Text>
-                  ))}
+              <Box>
+                <Box>
+                  <Box
+                    display="flex"
+                    justifyContent="center"
+                    gap={1}
+                    backgroundColor="rgba(0, 0, 0, 0.8)"
+                    py={2}
+                    borderBottomRadius="12px"
+                  >
+                    <Box>
+                      <Box
+                        mx={2}
+                        display="flex"
+                        flexDir="column"
+                        alignItems="flex-start"
+                        minW="220px"
+                      >
+                        <Text fontWeight="thin"> Authors: </Text>
+                        <Box
+                          display="flex"
+                          flexDir="column"
+                          whiteSpace="nowrap"
+                          alignItems="flex-start"
+                          textDecor="underline"
+                        >
+                          {book.volumeInfo.authors &&
+                            book.volumeInfo.authors.map((author) => (
+                              <Text fontSize="1xl" fontWeight="hairline">
+                                {author}
+                              </Text>
+                            ))}
+                        </Box>
+                        <Text fontSize="md" fontWeight="thin">
+                          Pages: {book.volumeInfo.pageCount}
+                        </Text>
+                        <Text
+                          fontSize="md"
+                          fontWeight="thin"
+                          minW="max-content"
+                        >
+                          Edition published: {book.volumeInfo.publishedDate}
+                        </Text>
+                      </Box>
+                      <Box
+                        display="flex"
+                        flexDir="column"
+                        gap={1}
+                        alignItems="center"
+                      >
+                        <Link
+                          href={book.volumeInfo.infoLink}
+                          isExternal
+                          width="95%"
+                        >
+                          <Button colorScheme="blue" width="100%">
+                            More info
+                          </Button>
+                        </Link>
+                        <Button
+                          width="95%"
+                          colorScheme="green"
+                          onClick={() =>
+                            addBook(
+                              book.volumeInfo.title,
+                              book.volumeInfo.authors,
+                              book.volumeInfo.pageCount,
+                              book.volumeInfo.publishedDate,
+                              book.volumeInfo.imageLinks.thumbnail
+                            )
+                          }
+                        >
+                          Add to My Library
+                        </Button>
+                      </Box>
+                    </Box>
+                  </Box>
+                </Box>
               </Box>
-              <Text fontSize="1xl">{book.volumeInfo.categories}</Text>
-              <Text fontSize="1xl">{book.volumeInfo.pageCount}</Text>
-              <Text fontSize="1xl">{book.volumeInfo.publishedDate}</Text>
-              <Image
-                src={
-                  book.volumeInfo.imageLinks &&
-                  book.volumeInfo.imageLinks.thumbnail
-                }
-              ></Image>
-              <Link href={book.volumeInfo.infoLink} isExternal>
-                <Button colorScheme="blue">More info</Button>
-              </Link>
-              <Button
-                colorScheme="blue"
-                onClick={() =>
-                  addBook(
-                    book.volumeInfo.title,
-                    book.volumeInfo.pageCount,
-                    book.volumeInfo.publishedDate
-                  )
-                }
-              >
-                Add to My Library
-              </Button>
-              {/* <Text>{book.volumeInfo.subtitle}</Text> */}
-              {/* <Text fontSize={12}>{book.volumeInfo.description}</Text> */}
             </Box>
           ))}
       </SimpleGrid>

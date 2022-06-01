@@ -17,6 +17,9 @@ import {
   Image,
   Link,
 } from "@chakra-ui/react";
+import { ImCross } from "react-icons/im";
+import { GiReturnArrow } from "react-icons/gi";
+import { MdOutlineFileDownloadDone } from "react-icons/md";
 
 function Account() {
   const [savedBooks, setSavedBooks] = useState([]);
@@ -25,23 +28,37 @@ function Account() {
   const { isOpen, onToggle, onClose, onOpen } = useDisclosure();
   const [editDone, setEditDone] = useState(false);
 
+  const [review, setReview] = useState("");
+  const [title, setTitle] = useState("");
+
   const editBook = (editByID) => {
     console.log(editByID);
     setId(editByID === id ? "" : editByID);
     setEditDone(true);
 
+    const bookToEdit = savedBooks.filter((book) => {
+      return book.id === editByID;
+    });
+
+    console.log(bookToEdit);
+    console.log(bookToEdit.image);
+
     if (editDone) {
       axios
         .put(`http://localhost:4000/books/${editByID}`, {
-          title: "putputput",
-          // pages: pages,
-          // published: published,
-          review: "yayayaya",
-          completed: 1,
+          title: title,
+          pages: bookToEdit[0].pages,
+          published: bookToEdit[0].published,
+          review: review,
+          image: bookToEdit[0].image,
+          completed: bookToEdit[0].completed,
         })
         .then((response) => {
           console.log(response);
+          getBooks();
           setEditDone(false);
+          setTitle("");
+          setReview("");
         })
         .catch((error) => console.log(error));
     }
@@ -54,6 +71,18 @@ function Account() {
   const getBooks = () => {
     axios
       .get("http://localhost:4000/books")
+      .then(function (response) {
+        console.log(response.data);
+        setSavedBooks(response.data);
+      })
+      .catch(function (error) {
+        console.error(error);
+      });
+  };
+
+  const filterComplete = (mode) => {
+    axios
+      .post(`http://localhost:4000/books/filter`, { filterMode: mode })
       .then(function (response) {
         console.log(response.data);
         setSavedBooks(response.data);
@@ -101,54 +130,115 @@ function Account() {
 
   return (
     <div>
-      <SimpleGrid
-        templateColumns={{ sm: "1fr 1fr", md: "1fr 1fr 1fr 1fr" }}
-        spacing={8}
-        my={4}
-      >
-        {savedBooks &&
-          savedBooks.map((book) => (
-            <Box
-              backgroundColor={book.completed === 1 ? "green.800" : "black"}
-              key={book.id}
-              border="#48BB78 solid 1px"
-              borderRadius="14px"
-              textColor="white"
-              // whiteSpace="nowrap"
-              display="flex"
-              flexDirection="column"
-              justifyContent="space-between"
-              maxWidth="300px"
-              // textAlign="left"
-              p={4}
-            >
-              <p>{book.id}</p>
-
-              <p>{book.title}</p>
-              <Collapse in={id === book.id}>
-                <Input placeholder="Update title"></Input>
-              </Collapse>
-              <p>{book.pages}</p>
-              <p>{book.published}</p>
-              <p>{book.review}</p>
-              <Collapse in={id === book.id}>
-                <Input placeholder="Write a review"></Input>
-              </Collapse>
-              <Button
-                colorScheme="blue"
-                onClick={() => completedBook(book.id, book.completed)}
+      <Center>
+        <Button onClick={() => filterComplete(0)}>Filter not read</Button>
+        <Button onClick={() => filterComplete(1)}>Filter read</Button>
+        <Button onClick={() => filterComplete("all")}>See all</Button>
+        <SimpleGrid
+          templateColumns={{ sm: "1fr 1fr", md: "1fr 1fr 1fr 1fr" }}
+          spacing={8}
+          my={4}
+        >
+          {savedBooks &&
+            savedBooks.map((book) => (
+              <Box
+                key={book.id}
+                backgroundImage={book.image}
+                bgImage={`linear-gradient(rgba(0, 0, 0, 0.527),rgba(0, 0, 0, 0.5)) , url(${book.image})`}
+                backgroundColor={book.completed === 1 ? "green.800" : "black"}
+                // border="#48BB78 solid 1px"
+                border={
+                  book.completed === 1 ? "green solid 5px" : "white solid 1px"
+                }
+                boxShadow="inner"
+                borderRadius="14px"
+                textColor="white"
+                // whiteSpace="nowrap"
+                display="flex"
+                flexDirection="column"
+                justifyContent="space-between"
+                // textAlign="left"
+                p={4}
+                maxW="220px"
               >
-                Completed
-              </Button>
-              <Button colorScheme="purple" onClick={() => removeBook(book.id)}>
-                Remove book
-              </Button>
-              <Button colorScheme="pink" onClick={() => editBook(book.id)}>
-                Edit symbol, review
-              </Button>
-            </Box>
-          ))}
-      </SimpleGrid>
+                <Box display="flex" flexDirection="column">
+                  <Box alignSelf="flex-end" display="flex" gap={1}>
+                    <Box
+                      onClick={() => completedBook(book.id, book.completed)}
+                      // borderRadius="full"
+                      borderRadius="2xl"
+                      bgColor="rgba(0, 255, 0, 0.2)"
+                      border="black 5px solid"
+                    >
+                      <MdOutlineFileDownloadDone size={30} color="white" />{" "}
+                    </Box>
+                    <Box alignSelf="flex-end">
+                      <Box
+                        onClick={() => removeBook(book.id)}
+                        // borderRadius="full"
+                        borderRadius="2xl"
+                        bgColor="rgba(0, 0, 255, 0.2)"
+                        border="black 5px solid"
+                      >
+                        <GiReturnArrow size={30} color="white" />
+                      </Box>
+                    </Box>
+                  </Box>
+                  <Box
+                    display="flex"
+                    flexDir="column"
+                    justifyContent="space-between"
+                  >
+                    <Box
+                      display="flex"
+                      flexDir="column"
+                      justifyContent="space-between"
+                    >
+                      <Text>{book.id}</Text>
+
+                      <Text fontSize="2xl" fontWeight="normal">
+                        {book.title}
+                      </Text>
+                      {/* <Collapse in={id === book.id}>
+                    <Input
+                      bgColor="black"
+                      onChange={(e) => setTitle(e.target.value)}
+                      placeholder="Update title [PREV.VALUE PREWRITTEN]"
+                    ></Input>
+                  </Collapse> */}
+                      <Collapse in={id === book.id}>
+                        <Input
+                          bgColor="black"
+                          onChange={(e) => setReview(e.target.value)}
+                          placeholder="Write a review"
+                        ></Input>
+                      </Collapse>
+                    </Box>
+                    <Box
+                      display="flex"
+                      flexDir="column"
+                      justifyContent="flex-end"
+                    >
+                      <Text>{book.authors}</Text>
+                      <Text>{book.pages === 0 ? "" : book.pages}</Text>
+                      <Text>{book.published}</Text>
+                      <Text>{book.review}</Text>
+                    </Box>
+                  </Box>
+                </Box>
+                <Button
+                  // bgColor="blackAlpha.800"
+                  // variant="outline"
+                  borderRadius="12px"
+                  colorScheme="pink"
+                  onClick={() => editBook(book.id)}
+                >
+                  Leave a Review...
+                </Button>
+              </Box>
+            ))}
+        </SimpleGrid>
+      </Center>
     </div>
   );
 }

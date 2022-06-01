@@ -12,6 +12,7 @@ import {
   FormLabel,
 } from "@chakra-ui/react";
 import React, { useState, useRef, useEffect } from "react";
+import axios from "axios";
 
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useNavigate } from "react-router-dom";
@@ -23,19 +24,34 @@ function SignUp() {
   const { isOpen, onToggle } = useDisclosure();
 
   const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
+  const [activationCode, setActivationCode] = useState("");
+
+  // POST
+  const addUser = (username, activationCode) => {
+    axios
+      .post("http://localhost:4000/users", {
+        username: username,
+        activationCode: activationCode,
+      })
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => console.log(error));
+  };
+
+  // const [password, setPassword] = useState("");
+  // const [email, setEmail] = useState("");
+  // const [phone, setPhone] = useState("");
 
   // This feels stupid, redo
   // const [address, setAddress] = useState(["", "", "", ""]);
-  const [city, setCity] = useState("");
-  const [street, setStreet] = useState("");
-  const [number, setNumber] = useState(0);
-  const [zipcode, setZipcode] = useState("");
+  // const [city, setCity] = useState("");
+  // const [street, setStreet] = useState("");
+  // const [number, setNumber] = useState(0);
+  // const [zipcode, setZipcode] = useState("");
 
-  const [firstname, setFirstname] = useState("");
-  const [lastname, setLastname] = useState("");
+  // const [firstname, setFirstname] = useState("");
+  // const [lastname, setLastname] = useState("");
 
   const inputRef = useRef();
   // useEffect(() => {
@@ -103,92 +119,28 @@ function SignUp() {
                 autoComplete="off"
                 color="white"
                 name="username"
-                placeholder="Hogname"
+                placeholder="Username"
                 type="text"
                 onChange={(e) => setUsername(e.target.value)}
               ></Input>
               <Input
-                name="password"
+                isRequired
+                // ref={inputRef}
+                autoComplete="off"
                 color="white"
-                placeholder="Password"
-                type="password"
-                onChange={(e) => setPassword(e.target.value)}
-              ></Input>
-            </Box>
-
-            <Box display="flex" flexDirection="row">
-              <Input
-                name="firstname"
-                color="white"
-                placeholder="First name"
+                name="activation"
+                placeholder="Activation code"
                 type="text"
-                onChange={(e) => setFirstname(e.target.value)}
-              ></Input>
-              <Input
-                name="lastname"
-                color="white"
-                placeholder="Last name"
-                type="text"
-                onChange={(e) => setLastname(e.target.value)}
-              ></Input>
-            </Box>
-
-            <Box display="flex" flexDirection="row">
-              <Input
-                name="email"
-                color="white"
-                placeholder="Email"
-                type="text"
-                onChange={(e) => setEmail(e.target.value)}
-              ></Input>
-              <Input
-                name="email"
-                color="white"
-                placeholder="Phone number"
-                type="tel"
-                onChange={(e) => setPhone(e.target.value)}
-              ></Input>
-            </Box>
-
-            <FormLabel color="white">User address</FormLabel>
-            <Box display="flex" flexDirection="row">
-              <Input
-                name="street"
-                color="white"
-                placeholder="Street name"
-                type="text"
-                onChange={(e) => setStreet(e.target.value)}
-              ></Input>
-              <Input
-                name="street number"
-                color="white"
-                placeholder="Street number"
-                type="number"
-                onChange={(e) => setNumber(e.target.value)}
-              ></Input>
-            </Box>
-            <Box display="flex" flexDirection="row">
-              <Input
-                name="text"
-                color="white"
-                placeholder="City"
-                type="text"
-                onChange={(e) => setCity(e.target.value)}
-              ></Input>
-              <Input
-                name="text"
-                color="white"
-                placeholder="Zipcode"
-                type="text"
-                onChange={(e) => setZipcode(e.target.value)}
+                onChange={(e) => setActivationCode(e.target.value)}
               ></Input>
             </Box>
             <Button
               colorScheme="green"
               type="submit"
               onClick={function () {
-                login();
-                welcomeFund();
+                addUser(username, activationCode);
+                // login();
+                // welcomeFund();
               }}
               rightIcon={<GiHedgehog />}
             >
