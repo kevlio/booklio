@@ -14,6 +14,8 @@ import {
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 
+import { userState } from "../users/atom";
+
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useNavigate } from "react-router-dom";
 
@@ -23,11 +25,14 @@ function SignUp() {
   const navigate = useNavigate();
   const { isOpen, onToggle } = useDisclosure();
 
+  const [user, setUser] = useRecoilState(userState);
+
   const [username, setUsername] = useState("");
   const [activationCode, setActivationCode] = useState("");
 
   // POST
   const addUser = (username, activationCode) => {
+    setUser([username, activationCode]);
     axios
       .post("http://localhost:4000/users", {
         username: username,
@@ -58,39 +63,39 @@ function SignUp() {
   //   inputRef.current.focus();
   // });
 
-  function welcomeFund() {}
+  // function welcomeFund() {}
 
-  const login = () => {
-    const userChecked = users.find((user) => user.username === username);
-    if (userChecked) {
-      onToggle();
-    }
-    if (userChecked) return;
+  // const login = () => {
+  //   const userChecked = users.find((user) => user.username === username);
+  //   if (userChecked) {
+  //     onToggle();
+  //   }
+  //   if (userChecked) return;
 
-    setLogged(true);
-    onToggle();
+  //   setLogged(true);
+  //   onToggle();
 
-    const newUser = {
-      username: username,
-      password: password,
-      email: email,
-      name: {
-        firstname: firstname,
-        lastname: lastname,
-      },
-      address: {
-        city: city,
-        street: street,
-        number: number,
-        zipcode: zipcode,
-      },
-      id: Math.floor(Math.random() * 10000),
-      role: "user",
-      phone: phone,
-    };
+  //   const newUser = {
+  //     username: username,
+  //     password: password,
+  //     email: email,
+  //     name: {
+  //       firstname: firstname,
+  //       lastname: lastname,
+  //     },
+  //     address: {
+  //       city: city,
+  //       street: street,
+  //       number: number,
+  //       zipcode: zipcode,
+  //     },
+  //     id: Math.floor(Math.random() * 10000),
+  //     role: "user",
+  //     phone: phone,
+  //   };
 
-    navigate("/myaccount");
-  };
+  //   navigate("/myaccount");
+  // };
 
   return (
     <Center height="100vh" alignItems="flex-start">
@@ -111,13 +116,13 @@ function SignUp() {
         </Box>
         <Box max-width="250px">
           <Stack>
-            <FormLabel color="white">User information</FormLabel>
+            <FormLabel>User information</FormLabel>
             <Box display="flex" flexDirection="row">
               <Input
                 isRequired
                 // ref={inputRef}
+                color="black"
                 autoComplete="off"
-                color="white"
                 name="username"
                 placeholder="Username"
                 type="text"
@@ -126,8 +131,8 @@ function SignUp() {
               <Input
                 isRequired
                 // ref={inputRef}
+                color="black"
                 autoComplete="off"
-                color="white"
                 name="activation"
                 placeholder="Activation code"
                 type="text"

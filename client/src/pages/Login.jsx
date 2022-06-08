@@ -21,6 +21,20 @@ function Login() {
 
   const navigate = useNavigate();
 
+  // POST
+  const login = (username, password) => {
+    setUser([username, password]);
+    axios
+      .post("http://localhost:4000/login", {
+        username: username,
+        password: password,
+      })
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => console.log(error));
+  };
+
   const loginb = () => {
     navigate("/myaccount");
 
@@ -63,7 +77,7 @@ function Login() {
               placeholder="Password"
               type="password"
             ></Input>
-            <Button type="submit" onClick={loginb} colorScheme="green">
+            <Button type="submit" onClick={login} colorScheme="green">
               Login
             </Button>
             <Fade in={isOpen}>

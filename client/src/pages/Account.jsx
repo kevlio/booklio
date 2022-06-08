@@ -21,7 +21,14 @@ import { ImCross } from "react-icons/im";
 import { GiReturnArrow } from "react-icons/gi";
 import { MdOutlineFileDownloadDone } from "react-icons/md";
 
+import { userState } from "../users/atom";
+
+import { useRecoilState, useRecoilValue } from "recoil";
+
 function Account() {
+  const [user, setUser] = useRecoilState(userState);
+  console.log(user);
+
   const [savedBooks, setSavedBooks] = useState([]);
   const [id, setId] = useState("");
 
@@ -29,8 +36,10 @@ function Account() {
   const [editDone, setEditDone] = useState(false);
 
   const [review, setReview] = useState("");
+  const [rating, setRating] = useState(0);
   const [title, setTitle] = useState("");
 
+  // Släp review, fixa
   const editBook = (editByID) => {
     console.log(editByID);
     setId(editByID === id ? "" : editByID);
@@ -46,10 +55,14 @@ function Account() {
     if (editDone) {
       axios
         .put(`http://localhost:4000/books/${editByID}`, {
-          title: title,
+          username: user[0],
+          activationCode: user[1],
+          title: bookToEdit[0].title,
+          authors: bookToEdit[0].authors,
           pages: bookToEdit[0].pages,
           published: bookToEdit[0].published,
           review: review,
+          rating: rating,
           image: bookToEdit[0].image,
           completed: bookToEdit[0].completed,
         })
@@ -70,7 +83,7 @@ function Account() {
 
   const getBooks = () => {
     axios
-      .get("http://localhost:4000/books")
+      .get(`http://localhost:4000/books/${user[0]}/${user[1]}`)
       .then(function (response) {
         console.log(response.data);
         setSavedBooks(response.data);
@@ -80,9 +93,17 @@ function Account() {
       });
   };
 
+  // query strings &
+  // Korrekt användning av post?
+  // /books?amount=20&startsWith=a
+  // Byta till get med query
   const filterComplete = (mode) => {
     axios
-      .post(`http://localhost:4000/books/filter`, { filterMode: mode })
+      .post(`http://localhost:4000/books/filter`, {
+        filterMode: mode,
+        username: user[0],
+        activationCode: user[1],
+      })
       .then(function (response) {
         console.log(response.data);
         setSavedBooks(response.data);
@@ -130,10 +151,27 @@ function Account() {
 
   return (
     <div>
-      <Center>
-        <Button onClick={() => filterComplete(0)}>Filter not read</Button>
-        <Button onClick={() => filterComplete(1)}>Filter read</Button>
-        <Button onClick={() => filterComplete("all")}>See all</Button>
+      <Center display="flex" flexDir="column">
+        <Text fontSize="2xl">Hey {user[0]}</Text>
+        <Box display="flex" gap={2}>
+          <Button onClick={() => filterComplete(0)}>Filter not read</Button>
+          <Button onClick={() => filterComplete(1)}>Filter read</Button>
+          <Button onClick={() => filterComplete("all")}>See all</Button>
+          <Button
+            color="white"
+            backgroundColor="black"
+            onClick={() => filterComplete("all")}
+          >
+            Filter by Author
+          </Button>
+          <Button
+            color="white"
+            backgroundColor="black"
+            onClick={() => filterComplete("all")}
+          >
+            Filter by Rating
+          </Button>
+        </Box>
         <SimpleGrid
           templateColumns={{ sm: "1fr 1fr", md: "1fr 1fr 1fr 1fr" }}
           spacing={8}
@@ -196,7 +234,13 @@ function Account() {
                     >
                       <Text>{book.id}</Text>
 
-                      <Text fontSize="2xl" fontWeight="normal">
+                      <Text
+                        fontSize="2xl"
+                        fontWeight="normal"
+                        // backgroundColor="black"
+                        // borderRadius="12px"
+                        // p={1}
+                      >
                         {book.title}
                       </Text>
                       {/* <Collapse in={id === book.id}>
@@ -212,6 +256,12 @@ function Account() {
                           onChange={(e) => setReview(e.target.value)}
                           placeholder="Write a review"
                         ></Input>
+                        <Input
+                          type="number"
+                          bgColor="black"
+                          onChange={(e) => setRating(e.target.value)}
+                          placeholder="Rating 1-5"
+                        ></Input>
                       </Collapse>
                     </Box>
                     <Box
@@ -222,19 +272,28 @@ function Account() {
                       <Text>{book.authors}</Text>
                       <Text>{book.pages === 0 ? "" : book.pages}</Text>
                       <Text>{book.published}</Text>
-                      <Text>{book.review}</Text>
+                      <Text>
+                        {book.rating ? `My Rating: ${book.rating}` : ""}
+                      </Text>
+                      <Text>{book.review && `My Review: ${book.review}`}</Text>
                     </Box>
                   </Box>
                 </Box>
-                <Button
-                  // bgColor="blackAlpha.800"
-                  // variant="outline"
-                  borderRadius="12px"
-                  colorScheme="pink"
-                  onClick={() => editBook(book.id)}
-                >
-                  Leave a Review...
-                </Button>
+                <Link href={!book.completed && "https://youtu.be/xm3YgoEiEDc"}>
+                  <Button
+                    // bgColor="blackAlpha.800"
+                    // variant="outline"
+                    borderRadius="12px"
+                    colorScheme={book.completed ? "green" : "purple"}
+                    onClick={() => book.completed && editBook(book.id)}
+                  >
+                    {book.completed
+                      ? !book.review
+                        ? "Leave a Review"
+                        : "Thanks for feedback"
+                      : "Open book"}
+                  </Button>
+                </Link>
               </Box>
             ))}
         </SimpleGrid>

@@ -40,6 +40,7 @@ const Header = () => {
 
   return (
     <Flex
+      fontWeight="semibold"
       as="nav"
       align="center"
       justify="space-between"
@@ -47,7 +48,7 @@ const Header = () => {
       w="100%"
       p={8}
       bg={["primary.500", "primary.500", "transparent", "transparent"]}
-      color={["white", "white", "primary.700", "primary.700"]}
+      color={["black", "black", "primary.700", "primary.700"]}
     >
       <Box display="flex" justifyContent="column" alignItems="center">
         <Box>
@@ -60,15 +61,16 @@ const Header = () => {
             <Text
               onClick={navigateAdmin}
               fontSize="smaller"
-              color="#48BB78"
+              fontWeight="bold"
+              color="black"
               my="-2"
               mb="1"
             >
-              Double pet owl for admin
+              communitas in the digital era
             </Text>
           </Link>
         </Box>
-        <Icon color="green" icon="emojione:owl" width="50px" height="50px" />
+        <Icon color="black" icon="emojione:owl" width="50px" height="50px" />
         {/* <GiHedgehog
           size={70}
           color="#48BB78"
@@ -78,7 +80,7 @@ const Header = () => {
       </Box>
       <Box
         display={{ base: "block", md: "none" }}
-        color="white"
+        color="black"
         onClick={() => toggleMenu()}
       >
         {menuIsOpen ? <CloseIcon size={50} /> : <MenuIcon size={40} />}
@@ -86,7 +88,7 @@ const Header = () => {
       <Box
         display={{ base: menuIsOpen ? "block" : "none", md: "block" }}
         flexBasis={{ base: "100%", md: "auto" }}
-        color="white"
+        color="black"
       >
         <Stack
           spacing={8}
