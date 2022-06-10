@@ -6,14 +6,23 @@ import {
   Stack,
   Heading,
   Text,
-  FormControl,
   Fade,
   useDisclosure,
 } from "@chakra-ui/react";
-import React, { useRef, useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useRecoilState } from "recoil";
+
+import { userState, tokenState, loginState } from "../users/atom";
+
+import axios from "axios";
 
 function Login() {
+  const [user, setUser] = useRecoilState(userState);
+  const [token, setToken] = useRecoilState(tokenState);
+  const [logged, setLogged] = useRecoilState(loginState);
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -25,22 +34,16 @@ function Login() {
   const login = (username, password) => {
     setUser([username, password]);
     axios
-      .post("http://localhost:4000/login", {
+      .post("http://localhost:4000/auth/login", {
         username: username,
         password: password,
       })
       .then((response) => {
         console.log(response);
+        setLogged(true);
+        navigate("/account/books");
       })
       .catch((error) => console.log(error));
-  };
-
-  const loginb = () => {
-    navigate("/myaccount");
-
-    if (true) {
-      onToggle();
-    }
   };
 
   return (
@@ -64,20 +67,24 @@ function Login() {
           <Stack>
             <Input
               isRequired
-              color="white"
+              color="black"
               name="username"
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Username"
               type="text"
             ></Input>
             <Input
-              color="white"
+              color="black"
               name="password"
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
               type="password"
             ></Input>
-            <Button type="submit" onClick={login} colorScheme="green">
+            <Button
+              type="submit"
+              onClick={() => login(username, password)}
+              colorScheme="green"
+            >
               Login
             </Button>
             <Fade in={isOpen}>

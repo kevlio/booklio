@@ -1,0 +1,18 @@
+MUSTS
+*****
+1. API:et ska svara med lämpligt meddelande och statuskod om något går fel,
+exempelvis om användaren skickar in fel strukturerad data
+2. API:et ska endast ta emot och skicka data i JSON-format
+ * Lägg till felhantering för detta genom req.is
+3. Städa kod, mkt onödigt finns. Ta ställning till user.books.controller
+4. Testa alla routes
+5. Kontroll korrekt path routes enligt krav
+6. Skicka med API-nyckel till Oscar
+7. Lämna databasen med böcker/användare etc för Oscars testning
+8. Avinstallera dotenv från frontend? Brukar bli trubbel...
+
+EXTRA VG KRAV (punkt 1 redan implementerad)
+*****
+2. Endpoints för /books ska även innehålla antalet böcker tillgängliga för utlåning
+3. Skriv en egen logging-middleware som sparar loggar med relevant info i en eller
+enskilda filer (tidsstämpel, request-metod, route, status)

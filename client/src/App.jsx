@@ -11,8 +11,16 @@ import Account from "./pages/Account";
 import Header from "./components/Header";
 
 import { Routes, Route } from "react-router-dom";
+import UserInfo from "./pages/UserInfo";
+import ReturnedBooks from "./pages/ReturnedBooks";
+
+import { loginState } from "./users/atom";
+
+import { useRecoilValue } from "recoil";
 
 function App() {
+  const logged = useRecoilValue(loginState);
+
   return (
     <div className="App">
       <Header />
@@ -22,7 +30,14 @@ function App() {
         <Route path="/books" element={<Books />}></Route>
         <Route path="/login" element={<Login />}></Route>
         <Route path="/signup" element={<SignUp />}></Route>
-        <Route path="/account" element={<Account />}></Route>
+
+        <Route path="/returned" element={<ReturnedBooks />}></Route>
+
+        <Route path="/account/books" element={logged && <Account />}></Route>
+        <Route
+          path="/account/settings"
+          element={logged && <UserInfo />}
+        ></Route>
       </Routes>
     </div>
   );

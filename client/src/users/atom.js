@@ -19,11 +19,17 @@ export const userState = atom({
   effects_UNSTABLE: [localStorageEffect("user")],
 });
 
-// export const loginState = atom({
-//   key: "login",
-//   default: null,
-//   effects_UNSTABLE: [localStorageEffect("login")],
-// });
+export const tokenState = atom({
+  key: "token",
+  default: "",
+  effects_UNSTABLE: [localStorageEffect("token")],
+});
+
+export const loginState = atom({
+  key: "login",
+  default: null,
+  effects_UNSTABLE: [localStorageEffect("login")],
+});
 
 // export const adminState = atom({
 //   key: "admin",

@@ -26,16 +26,16 @@ import {
   Collapse,
 } from "@chakra-ui/react";
 
-import { userState } from "../users/atom";
+import { userState, loginState, tokenState } from "../users/atom";
 
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState } from "recoil";
 
-const key = "AIzaSyAW9L7jgxCZQhN4OM1WmXdG9sBicXDDuDc";
-// AIzaSyAW9L7jgxCZQhN4OM1WmXdG9sBicXDDuDc
-// https://www.googleapis.com/books/v1/volumes?q=flowers+inauthor:keyes&key=yourAPIKey
+import { useNavigate } from "react-router-dom";
+
 function Books() {
+  const [logged, setLogged] = useRecoilState(loginState);
   const [user, setUser] = useRecoilState(userState);
-  console.log(user);
+  const [token, setToken] = useRecoilState(tokenState);
   // Search
   const [volumeSearch, setVolumeSearch] = useState("");
   const [authorSearch, setAuthorSearch] = useState("");
@@ -49,20 +49,16 @@ function Books() {
   const [pages, setPages] = useState(0);
   const [published, setPublished] = useState("");
 
-  // const [post, setPost] = useState({});
   const { isOpen, onToggle, onClose, onOpen } = useDisclosure();
+  const navigate = useNavigate();
   const [showInfo, setShowInfo] = useState(true);
-
-  console.log(author);
-  // etc etc
-
-  // Fetch by Search
 
   const search = () => {
     setShowInfo(false);
+
     axios
       .get(
-        `https://www.googleapis.com/books/v1/volumes?q=${volumeSearch}+$inauthor:${authorSearch}&key=${key}`
+        `http://localhost:4000/books/global?volumeSearch=${volumeSearch}&authorSearch=${authorSearch}`
       )
       .then((res) => {
         setBooks(res.data);
@@ -74,27 +70,37 @@ function Books() {
   // POST
   const addBook = (title, authors, pages, published, image) => {
     console.log(title, authors, pages, published, image);
-    // completed false = 0, completed true = 1
+    if (!logged) {
+      onOpen();
+      return;
+    }
+
     axios
-      .post("http://localhost:4000/books", {
-        title: title,
-        authors: authors,
-        pages: pages,
-        published: published,
-        image: image,
-        username: user[0],
-        activationCode: user[1],
-        rating: 0,
-        review: "",
-        completed: 0,
-      })
+      .post(
+        "http://localhost:4000/users/lend",
+        {
+          title: title,
+          authors: authors,
+          pages: pages,
+          published: published,
+          image: image,
+          username: user[0],
+          activationCode: user[1],
+          rating: 0,
+          review: "",
+          completed: 0,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
       .then((response) => {
         console.log(response);
       })
       .catch((error) => console.log(error));
   };
-
-  console.log(books);
 
   const Arrow = createIcon({
     displayName: "Arrow",
@@ -131,6 +137,20 @@ function Books() {
           Search for books
         </Button>
       </Box>
+      <Collapse in={!logged && isOpen}>
+        <Box display="flex" flexDir="column" gap={1} mt={2}>
+          <Button fontSize="1sxl">To lend books</Button>
+          <Box display="flex" flexDir="row" gap={1}>
+            <Button variant="link" onClick={() => navigate("/login")}>
+              Log in
+            </Button>
+            <Text>or</Text>
+            <Button variant="link" onClick={() => navigate("/signup")}>
+              Sign up
+            </Button>
+          </Box>
+        </Box>
+      </Collapse>
       <Collapse in={showInfo}>
         <Container maxW={"3xl"}>
           <Stack as={Box} textAlign={"center"} spacing={{ base: 4, md: 6 }}>

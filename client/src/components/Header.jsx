@@ -13,7 +13,10 @@ import { useNavigate } from "react-router-dom";
 
 import { Icon } from "@iconify/react";
 
+import { loginState } from "../users/atom";
+
 const Header = () => {
+  const [logged, setLogged] = useRecoilState(loginState);
   const [menuIsOpen, setMenuIsOpen] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {
@@ -25,13 +28,9 @@ const Header = () => {
   const navigate = useNavigate();
 
   const handleLogged = () => {
-    if (true) {
+    if (logged) {
+      setLogged(false);
     }
-  };
-
-  const navigateAdmin = () => {
-    // handleLogged();
-    navigate("/");
   };
 
   const toggleMenu = () => {
@@ -57,26 +56,17 @@ const Header = () => {
               Booklio
             </Text>
           </Link>
-          <Link to="/" onClick={navigateAdmin}>
-            <Text
-              onClick={navigateAdmin}
-              fontSize="smaller"
-              fontWeight="bold"
-              color="black"
-              my="-2"
-              mb="1"
-            >
-              communitas in the digital era
-            </Text>
-          </Link>
+          <Text
+            fontSize="smaller"
+            fontWeight="bold"
+            color="black"
+            my="-2"
+            mb="1"
+          >
+            communitas in the digital era
+          </Text>
         </Box>
         <Icon color="black" icon="emojione:owl" width="50px" height="50px" />
-        {/* <GiHedgehog
-          size={70}
-          color="#48BB78"
-          value="admin"
-          onDoubleClick={navigateAdmin}
-        /> */}
       </Box>
       <Box
         display={{ base: "block", md: "none" }}
@@ -98,15 +88,15 @@ const Header = () => {
           pt={[4, 4, 0, 0]}
           fontSize="2xl"
         >
-          <Link href="/">home</Link>
           <Link href="/books">books</Link>
-          <Link href={`${true ? "/account" : "/signup"}`}>{`${
-            true ? "account" : "sign up"
+          <Link href="/returned">community collection</Link>
+          <Link href={`${logged ? "/account/books" : "/signup"}`}>{`${
+            logged ? "my account" : "sign up"
           }`}</Link>
           <Link
-            href={`${true ? "/account" : "/login"}`}
+            href={`${logged ? "/account/books" : "/login"}`}
             onClick={handleLogged}
-          >{`${true ? "logout" : "login"}`}</Link>
+          >{`${logged ? "logout" : "login"}`}</Link>
         </Stack>
       </Box>
     </Flex>
