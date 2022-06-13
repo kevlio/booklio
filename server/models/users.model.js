@@ -15,7 +15,6 @@ function getUsers() {
 
 function getOneUser(user) {
   console.log(user);
-  // const username = user;
   const sql = "SELECT * FROM users WHERE username = ?";
   return new Promise((resolve, reject) => {
     db.get(sql, user, (error, rows) => {

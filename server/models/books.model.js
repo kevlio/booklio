@@ -1,5 +1,8 @@
 const db = require("../config/db");
 
+// BASIC REQUIREMENTS (GET ALL, GET/ID, DELETE/ID, POST, PUT, PATCH)
+
+// GET ALL BOOKS
 function getBooks() {
   const sql = "SELECT * FROM books";
   return new Promise((resolve, reject) => {
@@ -13,10 +16,11 @@ function getBooks() {
   });
 }
 
-function getReturnedBooks() {
-  const sql = "SELECT * FROM returned_books";
+// GET ONE BOOK
+function getOneBook(id) {
+  const sql = "SELECT * FROM books where id = ?";
   return new Promise((resolve, reject) => {
-    db.all(sql, (error, rows) => {
+    db.all(sql, [id], (error, rows) => {
       if (error) {
         console.error(error.message);
         reject(error);
@@ -26,10 +30,11 @@ function getReturnedBooks() {
   });
 }
 
-function getReturnedBooksFilterRating(ascDesc) {
-  const sql = `SELECT * FROM returned_books ORDER BY rating ${ascDesc}`;
+// DELETE ONE BOOK
+function deleteBook(id) {
+  const sql = "DELETE from books where id = ?";
   return new Promise((resolve, reject) => {
-    db.all(sql, (error, rows) => {
+    db.run(sql, [id], (error, rows) => {
       if (error) {
         console.error(error.message);
         reject(error);
@@ -39,59 +44,7 @@ function getReturnedBooksFilterRating(ascDesc) {
   });
 }
 
-function userBooks(username) {
-  const sql = "SELECT * FROM books WHERE username = ?";
-  return new Promise((resolve, reject) => {
-    db.all(sql, username, (error, rows) => {
-      if (error) {
-        console.error(error.message);
-        reject(error);
-      }
-      resolve(rows);
-    });
-  });
-}
-
-function userBooksCompletion(username, completionStatus) {
-  const sql = "SELECT * FROM books WHERE completed = ? AND username = ?";
-  return new Promise((resolve, reject) => {
-    db.all(sql, [completionStatus, username], (error, rows) => {
-      if (error) {
-        console.error(error.message);
-        reject(error);
-      }
-      resolve(rows);
-    });
-  });
-}
-
-function userBooksRating(username, ascDesc) {
-  // Går detta att göra utan ``?
-  const sql = `SELECT * FROM books WHERE username = ? ORDER BY rating ${ascDesc}`;
-  return new Promise((resolve, reject) => {
-    db.all(sql, [username], (error, rows) => {
-      if (error) {
-        console.error(error.message);
-        reject(error);
-      }
-      resolve(rows);
-    });
-  });
-}
-
-function userBooksCompletionAndRating(username, completionStatus, ascDesc) {
-  const sql = `SELECT * FROM books WHERE username = ? AND completed = ? ORDER BY rating ${ascDesc}`;
-  return new Promise((resolve, reject) => {
-    db.all(sql, [username, completionStatus], (error, rows) => {
-      if (error) {
-        console.error(error.message);
-        reject(error);
-      }
-      resolve(rows);
-    });
-  });
-}
-
+// ADD ONE BOOK
 function addBook(book) {
   const sql =
     "INSERT INTO books (title, authors, pages, published, image, review, rating, completed, username, activation_code) VALUES (?,?,?,?,?,?,?,?,?,?)";
@@ -121,10 +74,11 @@ function addBook(book) {
   });
 }
 
-function deleteBook(id) {
-  const sql = "DELETE from books where id = ?";
+// UPDATE ONE BOOK (PARTIAL,COMPLETION, REQ PATCH)
+function completionBook(id, status) {
+  const sql = "UPDATE books SET completed = ? where id = ?";
   return new Promise((resolve, reject) => {
-    db.run(sql, [id], (error, rows) => {
+    db.run(sql, [status, id], (error) => {
       if (error) {
         console.error(error.message);
         reject(error);
@@ -134,62 +88,7 @@ function deleteBook(id) {
   });
 }
 
-function deleteReturnedBook(id) {
-  const sql = "DELETE from returned_books where id = ?";
-  return new Promise((resolve, reject) => {
-    db.run(sql, [id], (error, rows) => {
-      if (error) {
-        console.error(error.message);
-        reject(error);
-      }
-      resolve();
-    });
-  });
-}
-
-function getOneBook(id) {
-  const sql = "SELECT * FROM books where id = ?";
-  return new Promise((resolve, reject) => {
-    db.all(sql, [id], (error, rows) => {
-      if (error) {
-        console.error(error.message);
-        reject(error);
-      }
-      resolve(rows);
-    });
-  });
-}
-
-function returnBook(book) {
-  console.log(book);
-  const sql =
-    "INSERT INTO returned_books (title, authors, pages, published, image, review, rating, completed, username, activation_code) VALUES (?,?,?,?,?,?,?,?,?,?)";
-  return new Promise((resolve, reject) => {
-    db.run(
-      sql,
-      [
-        book.title,
-        book.authors,
-        book.pages,
-        book.published,
-        book.image,
-        book.review,
-        book.rating,
-        book.completed,
-        book.username,
-        book.activationCode,
-      ],
-      (error) => {
-        if (error) {
-          console.error(error.message);
-          reject(error);
-        }
-        resolve();
-      }
-    );
-  });
-}
-
+// UPDATE ONE BOOK (COMPLETELY, REQ PUT)
 function reviewBook(book) {
   console.log("book");
   console.log(book);
@@ -221,10 +120,58 @@ function reviewBook(book) {
   });
 }
 
-function completionBook(id, status) {
-  const sql = "UPDATE books SET completed = ? where id = ?";
+// BONUS REQUIREMENTS
+
+// GET USER BOOKS
+function userBooks(username) {
+  const sql = "SELECT * FROM books WHERE username = ?";
   return new Promise((resolve, reject) => {
-    db.run(sql, [status, id], (error) => {
+    db.all(sql, username, (error, rows) => {
+      if (error) {
+        console.error(error.message);
+        reject(error);
+      }
+      resolve(rows);
+    });
+  });
+}
+
+// RETURN ONE LEND BOK (POST TO DB: RETURNED BOOKS, DELETE IN DB: BOOKS)
+function returnBook(book) {
+  console.log(book);
+  const sql =
+    "INSERT INTO returned_books (title, authors, pages, published, image, review, rating, completed, username, activation_code) VALUES (?,?,?,?,?,?,?,?,?,?)";
+  return new Promise((resolve, reject) => {
+    db.run(
+      sql,
+      [
+        book.title,
+        book.authors,
+        book.pages,
+        book.published,
+        book.image,
+        book.review,
+        book.rating,
+        book.completed,
+        book.username,
+        book.activationCode,
+      ],
+      (error) => {
+        if (error) {
+          console.error(error.message);
+          reject(error);
+        }
+        resolve();
+      }
+    );
+  });
+}
+
+// DELETE RETURNED BOOK
+function deleteReturnedBook(id) {
+  const sql = "DELETE from returned_books where id = ?";
+  return new Promise((resolve, reject) => {
+    db.run(sql, [id], (error, rows) => {
       if (error) {
         console.error(error.message);
         reject(error);
@@ -232,6 +179,97 @@ function completionBook(id, status) {
       resolve();
     });
   });
+}
+
+// GET ALL RETURNED BOOKS
+function getReturnedBooks() {
+  const sql = "SELECT * FROM returned_books";
+  return new Promise((resolve, reject) => {
+    db.all(sql, (error, rows) => {
+      if (error) {
+        console.error(error.message);
+        reject(error);
+      }
+      resolve(rows);
+    });
+  });
+}
+
+// GE ALL RETURNED BOOKS BY RATING
+function getReturnedBooksFilterRating(ascDesc) {
+  const sql = `SELECT * FROM returned_books ORDER BY rating ${ascDesc}`;
+  return new Promise((resolve, reject) => {
+    db.all(sql, (error, rows) => {
+      if (error) {
+        console.error(error.message);
+        reject(error);
+      }
+      resolve(rows);
+    });
+  });
+}
+
+// FILTER USER BOOKS BY COMPLETION STATUS
+function userBooksCompletion(username, completionStatus) {
+  const sql = "SELECT * FROM books WHERE completed = ? AND username = ?";
+  return new Promise((resolve, reject) => {
+    db.all(sql, [completionStatus, username], (error, rows) => {
+      if (error) {
+        console.error(error.message);
+        reject(error);
+      }
+      resolve(rows);
+    });
+  });
+}
+
+// FILTER USER BOOKS BY RATING
+function userBooksRating(username, ascDesc) {
+  const sql = `SELECT * FROM books WHERE username = ? ORDER BY rating ${ascDesc}`;
+  return new Promise((resolve, reject) => {
+    db.all(sql, [username], (error, rows) => {
+      if (error) {
+        console.error(error.message);
+        reject(error);
+      }
+      resolve(rows);
+    });
+  });
+}
+
+// FILTER USER BOOKS BY COMPLETION AND RATING
+function userBooksCompletionAndRating(username, completionStatus, ascDesc) {
+  const sql = `SELECT * FROM books WHERE username = ? AND completed = ? ORDER BY rating ${ascDesc}`;
+  return new Promise((resolve, reject) => {
+    db.all(sql, [username, completionStatus], (error, rows) => {
+      if (error) {
+        console.error(error.message);
+        reject(error);
+      }
+      resolve(rows);
+    });
+  });
+}
+
+// CONTROL FUNCTIONS
+function checkBookObject(book) {
+  if (
+    typeof book.title === "string" &&
+    typeof book.authors === "string" &&
+    typeof book.pages === "number" &&
+    typeof book.published === "string" &&
+    typeof book.completed === "number" &&
+    typeof book.review === "string" &&
+    typeof book.rating === "number" &&
+    typeof book.username === "string" &&
+    typeof book.activationCode === "string" &&
+    typeof book.image === "string"
+  ) {
+    console.log("Conditions true");
+    return true;
+  }
+  console.log("Conditions false");
+  return false;
 }
 
 module.exports = {
@@ -249,4 +287,5 @@ module.exports = {
   getReturnedBooks,
   deleteReturnedBook,
   getReturnedBooksFilterRating,
+  checkBookObject,
 };

@@ -34,6 +34,8 @@ function Account() {
 
   const [review, setReview] = useState("");
   const [rating, setRating] = useState(0);
+  console.log(rating);
+  console.log(typeof rating);
   const [title, setTitle] = useState("");
 
   const [ratingOrder, setRatingOrder] = useState("");
@@ -53,16 +55,16 @@ function Account() {
         .put(
           `http://localhost:4000/books/${editByID}`,
           {
-            username: user[0],
-            activationCode: user[1],
             title: bookToEdit[0].title,
             authors: bookToEdit[0].authors,
             pages: bookToEdit[0].pages,
             published: bookToEdit[0].published,
-            review: review,
-            rating: rating,
-            image: bookToEdit[0].image,
             completed: bookToEdit[0].completed,
+            review: review,
+            rating: Number(rating),
+            username: user[0],
+            activationCode: user[1],
+            image: bookToEdit[0].image,
           },
           {
             headers: {
@@ -95,11 +97,11 @@ function Account() {
           Authorization: `Bearer ${token}`,
         },
       })
-      .then(function (response) {
+      .then((response) => {
         console.log(response.data);
         setSavedBooks(response.data);
       })
-      .catch(function (error) {
+      .catch((error) => {
         console.error(error);
       });
   };
@@ -308,8 +310,8 @@ function Account() {
                   <Text>
                     {book.published !== "0" ? `${book.published}` : ""}
                   </Text>
-                  <Text>{book.rating ? `My Rating: ${book.rating}` : ""}</Text>
                   <Text>{book.review && `My Review: ${book.review}`}</Text>
+                  <Text>{book.rating ? `My Rating: ${book.rating}` : ""}</Text>
                 </Box>
                 <Link href={!book.completed && "https://youtu.be/xm3YgoEiEDc"}>
                   <Button
