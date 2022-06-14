@@ -128,6 +128,7 @@ function SignUp() {
                 <Input
                   isRequired
                   // ref={inputRef}
+                  value={activationCode && activationCode}
                   color="black"
                   autoComplete="off"
                   name="activation"
@@ -155,11 +156,7 @@ function SignUp() {
                 <Button
                   colorScheme="green"
                   width="40%"
-                  onClick={
-                    socialNumber
-                      ? activationCodeGenerator()
-                      : console.log("Enter social secury number")
-                  }
+                  onClick={activationCodeGenerator}
                 >
                   Get code
                 </Button>
