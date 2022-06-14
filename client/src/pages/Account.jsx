@@ -39,47 +39,7 @@ function Account() {
   const [ratingOrder, setRatingOrder] = useState("");
   const [completionMode, setCompletionMode] = useState("");
 
-  const editBook = (editByID) => {
-    console.log(editByID);
-    setId(editByID === id ? "" : editByID);
-    setEditDone(true);
-
-    const bookToEdit = savedBooks.filter((book) => {
-      return book.id === editByID;
-    });
-
-    if (editDone) {
-      axios
-        .put(
-          `http://localhost:4000/books/${editByID}`,
-          {
-            username: user[0],
-            activationCode: user[1],
-            title: bookToEdit[0].title,
-            authors: bookToEdit[0].authors,
-            pages: bookToEdit[0].pages,
-            published: bookToEdit[0].published,
-            review: review,
-            rating: rating,
-            image: bookToEdit[0].image,
-            completed: bookToEdit[0].completed,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        )
-        .then((response) => {
-          console.log(response);
-          getBooks();
-          setEditDone(false);
-          setTitle("");
-          setReview("");
-        })
-        .catch((error) => console.log(error));
-    }
-  };
+  const [responseMessage, setResponseMessage] = useState();
 
   useEffect(() => {
     getBooks();
@@ -95,11 +55,11 @@ function Account() {
           Authorization: `Bearer ${token}`,
         },
       })
-      .then(function (response) {
+      .then((response) => {
         console.log(response.data);
         setSavedBooks(response.data);
       })
-      .catch(function (error) {
+      .catch((error) => {
         console.error(error);
       });
   };
@@ -145,6 +105,48 @@ function Account() {
       .catch(function (error) {
         console.error(error);
       });
+  };
+
+  const editBook = (editByID) => {
+    console.log(editByID);
+    setId(editByID === id ? "" : editByID);
+    setEditDone(true);
+
+    const bookToEdit = savedBooks.filter((book) => {
+      return book.id === editByID;
+    });
+
+    if (editDone) {
+      axios
+        .put(
+          `http://localhost:4000/books/${editByID}`,
+          {
+            title: bookToEdit[0].title,
+            authors: bookToEdit[0].authors,
+            pages: bookToEdit[0].pages,
+            published: bookToEdit[0].published,
+            completed: bookToEdit[0].completed,
+            review: review,
+            rating: Number(rating),
+            username: user[0],
+            activationCode: user[1],
+            image: bookToEdit[0].image,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+        .then((response) => {
+          console.log(response);
+          getBooks();
+          setEditDone(false);
+          setTitle("");
+          setReview("");
+        })
+        .catch((error) => console.log(error));
+    }
   };
 
   const completedBook = (id, completed) => {
@@ -308,8 +310,10 @@ function Account() {
                   <Text>
                     {book.published !== "0" ? `${book.published}` : ""}
                   </Text>
-                  <Text>{book.rating ? `My Rating: ${book.rating}` : ""}</Text>
                   <Text>{book.review && `My Review: ${book.review}`}</Text>
+                  <Text>
+                    {book.rating !== 0 ? `My Rating: ${book.rating}` : ""}
+                  </Text>
                 </Box>
                 <Link href={!book.completed && "https://youtu.be/xm3YgoEiEDc"}>
                   <Button

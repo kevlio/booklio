@@ -53,6 +53,9 @@ function Books() {
   const navigate = useNavigate();
   const [showInfo, setShowInfo] = useState(true);
 
+  const [addedBook, setAddedBook] = useState([]);
+  console.log(addedBook);
+
   const search = () => {
     setShowInfo(false);
 
@@ -152,7 +155,7 @@ function Books() {
         </Box>
       </Collapse>
       <Collapse in={showInfo}>
-        <Container maxW={"3xl"}>
+        <Container maxW={"3xl"} mt={2}>
           <Stack as={Box} textAlign={"center"} spacing={{ base: 4, md: 6 }}>
             <Heading
               fontWeight={600}
@@ -160,7 +163,7 @@ function Books() {
               lineHeight={"110%"}
               color={"var(--chakra-colors-black-300)"}
             >
-              Communitas education <br />
+              Booklio <br />
               <Text as={"span"} color={"green.400"}>
                 e-book movement
               </Text>
@@ -200,17 +203,8 @@ function Books() {
                 color={"green.400"}
                 fontSize={{ base: "2xl", sm: "3xl", md: "3xl" }}
               >
-                Welcome to invest in the free world.
+                Welcome to education in the 21th century
               </Text>
-              <StatGroup color="var(--chakra-colors-gray-300)">
-                <Stat>
-                  <StatLabel fontSize="xl">Inflation: Kebab</StatLabel>
-                  <StatHelpText fontSize="xl">
-                    <StatArrow type="increase" color="red" />
-                    13.36%
-                  </StatHelpText>
-                </Stat>
-              </StatGroup>
             </Box>
             <Stack
               direction={"column"}
@@ -233,7 +227,7 @@ function Books() {
                   Get Started
                 </Button>
               </Link>
-              <Link href="/cryptos">
+              <Link href="/signup">
                 <Button variant={"link"} colorScheme={"blue"} size={"sm"}>
                   Learn more
                 </Button>
@@ -255,7 +249,7 @@ function Books() {
                   transform={"rotate(10deg)"}
                   color={"var(--chakra-colors-gray-300)"}
                 >
-                  Become a Hedgehog
+                  Become an Owl
                 </Text>
               </Box>
             </Stack>
@@ -274,37 +268,35 @@ function Books() {
                 book.volumeInfo.imageLinks &&
                 book.volumeInfo.imageLinks.thumbnail
               }
+              bgImage={`linear-gradient(rgba(0, 0, 0, 0.527),rgba(0, 0, 0, 0.5)) , url(${
+                book.volumeInfo.imageLinks &&
+                book.volumeInfo.imageLinks.thumbnail
+              })`}
               backgroundSize="cover"
               backgroundRepeat="no-repeat"
               m={2}
-              key={book.accessInfo.id}
+              key={book.id}
               border="grey solid 2px"
               borderRadius="14px"
               textColor="white"
               display="flex"
               flexDirection="column"
-              justifyContent="center"
+              justifyContent="space-between"
               p={2}
               boxShadow="inner"
               mx={2}
+              maxWidth="250px"
+              // height="350px"
             >
               <Box
                 borderTopRadius="12px"
                 display="flex"
                 flexDir="column"
-                backgroundColor="rgba(0, 0, 0, 0.8)"
+                // backgroundColor="rgba(0, 0, 0, 0.8)"
               >
                 <Text fontSize="2xl" wordBreak="break-word">
-                  {book.volumeInfo.title.split(" ").slice(0, 0)}
+                  {book.volumeInfo.title}
                 </Text>
-                <Text fontSize="2xl" wordBreak="break-word">
-                  {book.volumeInfo.title.split(" ").slice(0, 1)}
-                </Text>
-                <Text fontSize="2xl" wordBreak="break-word">
-                  {book.volumeInfo.title.split(" ").slice(1, 2)}
-                </Text>
-                <Text fontSize="2xl">{book.volumeInfo.averageRating}</Text>
-
                 <Box display="flex" flexDirection="column">
                   {book.volumeInfo.categories &&
                     book.volumeInfo.categories.map((category) => (
@@ -345,6 +337,10 @@ function Books() {
                               </Text>
                             ))}
                         </Box>
+                        <Text>
+                          {book.volumeInfo.averageRating &&
+                            `Rating: ${book.volumeInfo.averageRating}`}
+                        </Text>
                         <Text fontSize="md" fontWeight="thin">
                           Pages: {book.volumeInfo.pageCount}
                         </Text>
@@ -373,8 +369,10 @@ function Books() {
                         </Link>
                         <Button
                           width="95%"
-                          colorScheme="green"
-                          onClick={() =>
+                          colorScheme={
+                            addedBook.includes(book.id) ? "purple" : "green"
+                          }
+                          onClick={() => {
                             addBook(
                               book.volumeInfo.title,
                               book.volumeInfo.authors,
@@ -383,10 +381,16 @@ function Books() {
                               book.volumeInfo.imageLinks
                                 ? book.volumeInfo.imageLinks.thumbnail
                                 : ""
-                            )
-                          }
+                            );
+                            // setAddedBook([]);
+                            setAddedBook((prevBooks) => {
+                              return [...prevBooks, book.id];
+                            });
+                          }}
                         >
-                          Add to My Library
+                          {addedBook.includes(book.id)
+                            ? "Added to My Library"
+                            : "Add to My Library"}
                         </Button>
                       </Box>
                     </Box>

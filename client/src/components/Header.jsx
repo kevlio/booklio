@@ -13,10 +13,13 @@ import { useNavigate } from "react-router-dom";
 
 import { Icon } from "@iconify/react";
 
-import { loginState } from "../users/atom";
+import { userState, tokenState, loginState } from "../users/atom";
 
 const Header = () => {
+  const [user, setUser] = useRecoilState(userState);
+  const [token, setToken] = useRecoilState(tokenState);
   const [logged, setLogged] = useRecoilState(loginState);
+
   const [menuIsOpen, setMenuIsOpen] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {
@@ -24,12 +27,13 @@ const Header = () => {
     onOpen: accOnOpen,
     onClose: accOnClose,
   } = useDisclosure();
-
   const navigate = useNavigate();
 
   const handleLogged = () => {
     if (logged) {
       setLogged(false);
+      setToken("");
+      setUser("");
     }
   };
 

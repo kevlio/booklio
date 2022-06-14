@@ -40,10 +40,14 @@ function Login() {
       })
       .then((response) => {
         console.log(response);
+        setToken(response.data);
         setLogged(true);
         navigate("/account/books");
       })
-      .catch((error) => console.log(error));
+      .catch((error) => {
+        console.log(error);
+        onToggle();
+      });
   };
 
   return (
