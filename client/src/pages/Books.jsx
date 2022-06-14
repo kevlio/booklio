@@ -53,6 +53,9 @@ function Books() {
   const navigate = useNavigate();
   const [showInfo, setShowInfo] = useState(true);
 
+  const [addedBook, setAddedBook] = useState([]);
+  console.log(addedBook);
+
   const search = () => {
     setShowInfo(false);
 
@@ -272,7 +275,7 @@ function Books() {
               backgroundSize="cover"
               backgroundRepeat="no-repeat"
               m={2}
-              key={book.accessInfo.id}
+              key={book.id}
               border="grey solid 2px"
               borderRadius="14px"
               textColor="white"
@@ -294,16 +297,6 @@ function Books() {
                 <Text fontSize="2xl" wordBreak="break-word">
                   {book.volumeInfo.title}
                 </Text>
-                {/* <Text fontSize="2xl" wordBreak="break-word">
-                  {book.volumeInfo.title.split(" ").slice(0, 0)}
-                </Text>
-                <Text fontSize="2xl" wordBreak="break-word">
-                  {book.volumeInfo.title.split(" ").slice(0, 1)}
-                </Text>
-                <Text fontSize="2xl" wordBreak="break-word">
-                  {book.volumeInfo.title.split(" ").slice(1, 2)}
-                </Text> */}
-
                 <Box display="flex" flexDirection="column">
                   {book.volumeInfo.categories &&
                     book.volumeInfo.categories.map((category) => (
@@ -376,8 +369,10 @@ function Books() {
                         </Link>
                         <Button
                           width="95%"
-                          colorScheme="green"
-                          onClick={() =>
+                          colorScheme={
+                            addedBook.includes(book.id) ? "purple" : "green"
+                          }
+                          onClick={() => {
                             addBook(
                               book.volumeInfo.title,
                               book.volumeInfo.authors,
@@ -386,10 +381,16 @@ function Books() {
                               book.volumeInfo.imageLinks
                                 ? book.volumeInfo.imageLinks.thumbnail
                                 : ""
-                            )
-                          }
+                            );
+                            // setAddedBook([]);
+                            setAddedBook((prevBooks) => {
+                              return [...prevBooks, book.id];
+                            });
+                          }}
                         >
-                          Add to My Library
+                          {addedBook.includes(book.id)
+                            ? "Added to My Library"
+                            : "Add to My Library"}
                         </Button>
                       </Box>
                     </Box>

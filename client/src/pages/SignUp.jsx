@@ -1,3 +1,11 @@
+import React, { useState, useRef } from "react";
+import axios from "axios";
+
+import { useRecoilState } from "recoil";
+import { useNavigate } from "react-router-dom";
+
+import { userState, tokenState, loginState } from "../users/atom";
+
 import {
   Input,
   Button,
@@ -11,14 +19,6 @@ import {
   useDisclosure,
   FormLabel,
 } from "@chakra-ui/react";
-
-import React, { useState, useRef } from "react";
-import axios from "axios";
-
-import { userState, tokenState, loginState } from "../users/atom";
-
-import { useRecoilState } from "recoil";
-import { useNavigate } from "react-router-dom";
 
 function SignUp() {
   const [logged, setLogged] = useRecoilState(loginState);
@@ -53,7 +53,10 @@ function SignUp() {
         setLogged(true);
         navigate("/account/settings");
       })
-      .catch((error) => console.log(error));
+      .catch((error) => {
+        console.log(error);
+        onToggle();
+      });
   };
 
   const [password, setPassword] = useState("");
@@ -131,14 +134,21 @@ function SignUp() {
                 ></Input>
               </Box>
             </Box>
-            <Button>Don't have a activation code? Click here!</Button>
-            <Box display="flex">
-              <Input placeholder="Social security number" width="60%"></Input>
-              <Button width="40%" onClick={activationCodeGenerator}>
-                Get code
-              </Button>
-            </Box>
-            <Text></Text>
+            <Button colorScheme="blue" onClick={() => onToggle()}>
+              Don't have a activation code? Click here!
+            </Button>
+            <Collapse in={isOpen}>
+              <Box display="flex">
+                <Input placeholder="Social security number" width="60%"></Input>
+                <Button
+                  colorScheme="green"
+                  width="40%"
+                  onClick={activationCodeGenerator}
+                >
+                  Get code
+                </Button>
+              </Box>
+            </Collapse>
             <Button
               colorScheme="green"
               type="submit"
@@ -148,11 +158,11 @@ function SignUp() {
             >
               Sign up
             </Button>
-            <Collapse in={isOpen}>
+            {/* <Collapse in={isOpen}>
               <Button bg="red" color="white" width="100%">
                 User already exist, please choose another one
               </Button>
-            </Collapse>
+            </Collapse> */}
             <Progress value={20} size="xs" colorScheme="pink" />
           </Stack>
         </Box>

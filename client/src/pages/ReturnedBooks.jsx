@@ -179,7 +179,9 @@ function ReturnedBooks() {
                       <Text>{book.authors}</Text>
                       <Text>{book.pages === 0 ? "" : book.pages}</Text>
                       <Text>{book.published}</Text>
-                      <Text>{book.rating ? `Rating: ${book.rating}` : ""}</Text>
+                      <Text>
+                        {book.rating !== "0" ? `Rating: ${book.rating}` : ""}
+                      </Text>
                       <Text>{book.review && `Review: ${book.review}`}</Text>
                     </Box>
                   </Box>

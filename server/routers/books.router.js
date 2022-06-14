@@ -1,9 +1,6 @@
 const express = require("express");
 
 const booksController = require("../controllers/books.controller");
-const usersController = require("../controllers/users.controller");
-
-const combinedController = require("../controllers/users.books.controller");
 const booksRouter = express.Router();
 
 const auth = require("../middlewares/auth");
@@ -29,6 +26,6 @@ booksRouter.get(
   auth,
   booksController.getAllReturnedBooksByRating
 );
-booksRouter.get("/me/:username", auth, combinedController.getUserBooksAndInfo);
+booksRouter.get("/me/:username", auth, booksController.getUserBooksAndInfo);
 
 module.exports = booksRouter;

@@ -1,4 +1,4 @@
-const model = require("../models/books.model");
+const books = require("../models/books.model");
 const users = require("../models/users.model");
 
 const axios = require("axios").default;
@@ -25,14 +25,14 @@ async function getGoogleBooks(req, res) {
 
 // GET ALL BOOKS
 async function getAllBooks(req, res) {
-  const result = await model.getBooks();
+  const result = await books.getBooks();
   res.status(200).json(result);
 }
 
 // GET ONE BOOK
 async function getBook(req, res) {
   const id = req.params.id;
-  const result = await model.getOneBook(id);
+  const result = await books.getOneBook(id);
   if (!result.length)
     return res.status(404).json({ message: "Book not found", status: 404 });
   res.status(200).json(result);
@@ -41,11 +41,11 @@ async function getBook(req, res) {
 // DELETE ONE BOOK
 async function deleteOneBook(req, res) {
   const id = req.params.id;
-  const result = await model.getOneBook(id);
+  const result = await books.getOneBook(id);
   if (!result.length)
     return res.status(404).json({ message: "Book not found", status: 404 });
 
-  await model.deleteBook(id);
+  await books.deleteBook(id);
 
   res.status(200).json({
     message: `Book deleted with ID ${result[0].id}`,
@@ -98,7 +98,7 @@ async function addOneBook(req, res) {
     activationCode,
   };
 
-  const checkDatatypes = model.checkBookObject(newBook);
+  const checkDatatypes = books.checkBookObject(newBook);
   if (!checkDatatypes)
     return res.status(422).json({
       message: "Object Keys missing or Incorrect Value Datatypes",
@@ -107,10 +107,10 @@ async function addOneBook(req, res) {
 
   if (req.url === "/users/lend/returned") {
     console.log("delete returned");
-    await model.deleteReturnedBook(id);
+    await books.deleteReturnedBook(id);
   }
 
-  await model.addBook(newBook);
+  await books.addBook(newBook);
   res.status(201).json(newBook);
 }
 
@@ -118,14 +118,17 @@ async function addOneBook(req, res) {
 async function completeOneBook(req, res) {
   const id = req.params.id;
   const status = req.body.completed;
-  const result = await model.getOneBook(id);
+  console.log(typeof status);
+  const result = await books.getOneBook(id);
+
+  console.log("update one book");
 
   if (!req.is("application/json"))
     return res
       .status(400)
       .json({ message: "Invalid Content Type", status: 400 });
 
-  if (!status)
+  if (!status === 0 && !status === 1)
     return res
       .status(400)
       .json({ message: "Completion Status is missing", status: 400 });
@@ -133,11 +136,11 @@ async function completeOneBook(req, res) {
   if (!result.length)
     return res.status(404).json({ message: "Book not found", status: 404 });
 
-  await model.completionBook(id, status);
-  const resultUpdated = await model.getOneBook(id);
+  await books.completionBook(id, status);
+  const resultUpdated = await books.getOneBook(id);
 
   res.status(200).json({
-    message: `Book updated with ID ${result[0].id}`,
+    message: `Book partially updated with ID ${result[0].id}`,
     book: resultUpdated,
     status: 200,
   });
@@ -180,20 +183,20 @@ async function reviewOneBook(req, res) {
       .status(400)
       .json({ message: "Invalid Content Type", status: 400 });
 
-  const result = await model.getOneBook(id);
+  const result = await books.getOneBook(id);
 
   if (!result.length)
     return res.status(404).json({ message: "Book not found", status: 404 });
 
-  const checkDatatypes = model.checkBookObject(updatedBook);
+  const checkDatatypes = books.checkBookObject(updatedBook);
   if (!checkDatatypes)
     return res.status(422).json({
       message: "Object Keys missing or Incorrect Value Datatypes",
       status: 422,
     });
 
-  await model.reviewBook(updatedBook);
-  const resultUpdated = await model.getOneBook(id);
+  await books.reviewBook(updatedBook);
+  const resultUpdated = await books.getOneBook(id);
 
   res.status(200).json({
     message: `Book updated with ID ${result[0].id}`,
@@ -207,7 +210,6 @@ async function reviewOneBook(req, res) {
 // GET USER BOOKS
 async function getUserBooks(req, res) {
   const username = req.params.username;
-
   let completed = req.query.completed && req.query.completed.toLowerCase();
   const rating = req.query.rating && req.query.rating.toUpperCase();
 
@@ -223,21 +225,26 @@ async function getUserBooks(req, res) {
 
   if (completed === undefined && rating === undefined) {
     console.log("get books");
-    const result = await model.userBooks(username);
+    const result = await books.userBooks(username);
     return res.status(200).json(result);
   }
 
-  // FILTER SECTION
+  if (completed || rating) {
+    filterUserBooks(username, completed, rating, req, res);
+  }
+}
+
+// FILTER USER BOOKS BY COMPLETION AND RATING
+async function filterUserBooks(username, completed, rating, req, res) {
   if (rating) {
     if (rating !== "ASC" && rating !== "DESC") {
       return res.status(404).send("Wrong Rating filter Query");
     }
   }
-
   //   Get User Books By Rating
   if (rating && !completed) {
     console.log("ONLY RATING");
-    const result = await model.userBooksRating(username, rating);
+    const result = await books.userBooksRating(username, rating);
     return res.status(200).json(result);
   }
 
@@ -253,7 +260,7 @@ async function getUserBooks(req, res) {
 
   if (typeof completed === "number" && rating) {
     console.log("BOTH");
-    const result = await model.userBooksCompletionAndRating(
+    const result = await books.userBooksCompletionAndRating(
       username,
       completed,
       rating
@@ -264,7 +271,7 @@ async function getUserBooks(req, res) {
   //  Get User Books By Completion Status
   if (typeof completed === "number" && !rating) {
     console.log("ONLY COMPLETE");
-    const result = await model.userBooksCompletion(username, completed);
+    const result = await books.userBooksCompletion(username, completed);
     return res.status(200).json(result);
   }
 }
@@ -278,13 +285,13 @@ async function returnOneBook(req, res) {
   if (!id)
     return res.status(400).json({ message: "Book ID is missing", status: 400 });
 
-  const returnedBook = await model.getOneBook(id);
+  const returnedBook = await books.getOneBook(id);
 
   if (!returnedBook.length)
     return res.status(404).json({ message: "Book not found", status: 404 });
 
-  await model.returnBook(returnedBook[0]);
-  await model.deleteBook(id);
+  await books.returnBook(returnedBook[0]);
+  await books.deleteBook(id);
 
   res.status(200).json({
     message: `Book returnd with ${id}`,
@@ -295,7 +302,7 @@ async function returnOneBook(req, res) {
 
 // GET ALL RETURNED BOOKS
 async function getAllReturnedBooks(req, res) {
-  const result = await model.getReturnedBooks();
+  const result = await books.getReturnedBooks();
   res.status(200).json(result);
 }
 
@@ -309,8 +316,25 @@ async function getAllReturnedBooksByRating(req, res) {
         .json({ message: "Wrong Rating filter Query", status: 404 });
     }
   }
-  const result = await model.getReturnedBooksFilterRating(rating);
+  const result = await books.getReturnedBooksFilterRating(rating);
   res.status(200).json(result);
+}
+
+// GET USER BOOKS AND INFO
+async function getUserBooksAndInfo(req, res) {
+  console.log("GET USER BOOKS + INFO");
+  const username = req.params.username;
+  console.log(username);
+
+  const userExist = await users.userCheck(username);
+  console.log(userExist);
+
+  if (!userExist) {
+    return res.status(404).send("Användaren finns inte");
+  }
+  const usersBooks = await books.userBooks(username);
+  const usersInfo = await users.getOneUser(username);
+  res.status(200).json({ usersInfo, usersBooks });
 }
 
 module.exports = {
@@ -325,4 +349,5 @@ module.exports = {
   getAllReturnedBooks,
   getAllReturnedBooksByRating,
   getGoogleBooks,
+  getUserBooksAndInfo,
 };

@@ -42,19 +42,19 @@ async function loginUser(req, res) {
   const { username, password } = req.body;
 
   if (!username || !password) {
-    return res.status(400).send("Du måste skicka in username och lösenord");
+    return res.status(400).send("Please send username and password to login");
   }
 
   const userExist = await model.userCheck(username);
   console.log(userExist);
 
   if (!userExist) {
-    return res.status(404).send("Användaren finns inte");
+    return res.status(404).send("User doesn't exist");
   }
 
   const hashedPassword = md5(password);
   if (userExist.password !== hashedPassword) {
-    return res.status(400).send("Lösenordet matchade inte");
+    return res.status(400).send("Incorrect password");
   }
 
   const token = jwt.sign(
