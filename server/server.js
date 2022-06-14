@@ -11,9 +11,14 @@ app.use(cors());
 app.use(express.json());
 
 const usersRouter = require("./routers/users.router");
-app.use(usersRouter);
 const booksRouter = require("./routers/books.router");
+const authRouter = require("./routers/auth.router");
+const lendRouter = require("./routers/lend.router");
+
+app.use("/users", usersRouter);
 app.use(booksRouter);
+app.use("/auth", authRouter);
+app.use("/lend", lendRouter);
 
 app.listen(4000, () => {
   console.log("Server is running on port 4000");

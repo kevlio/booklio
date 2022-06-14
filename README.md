@@ -11,27 +11,30 @@
     /books                  POST (Section B.1a)
     /books/global           GET  (Section B.1d)
     /books/:id              GET, DELETE
-    /books/:id              PUT   (Section B.1a)   AUTH
-    /books/:id              PATCH (Section B.1c)   AUTH
+    /books/:id              PUT   (Section B.1a)   
+    /books/:id              PATCH (Section B.1c)   
+
+### Auth
+    /auth/register          POST  (Section B.2a)
+    /auth/login             POST  (Section B.2b)
 
 ### Users
     /users                  GET     
     /users/:username        GET                    AUTH
-    /auth/register          POST  (Section B.2a)
-    /auth/login             POST
 
-### Books + Users
-    /:username/books        GET   (Section B.1e)   AUTH
-    /users/lend             POST  (Section B.1a)   AUTH 
-    /users/lend/returned    POST  (Section B.1b)   AUTH 
-    /users/return           POST  (Section B.1a)   AUTH 
-    /returned               GET                    AUTH
-    /returned/filter        GET   (Section B.1f)   AUTH
-    /me/:username           GET                    AUTH
+### Lent books
+    /lend                   POST  (Section B.1a)   AUTH 
+    /lend/return            POST  (Section B.1b)   AUTH 
+    /lend/returned          GET                    AUTH
+    /lend/returned/filter   GET   (Section B.1f)   AUTH
+
+### User books and info
+    /me/:username/books     GET   (Section B.1e)   AUTH
+    /me/:username/all       GET                    AUTH
 
 ## B) Object Structure and Datatypes
-### Books
-#### 1a) Books - POST, PUT:
+### Books/Lend/Me
+#### 1a) Books/Lend - POST, PUT:
 		{	"title": String, 
 			"authors": String,
 			"pages": Number,
@@ -56,7 +59,7 @@
 			"review": "Very gut",
 			"completed": 1  }
 
-#### 1b. Books - Add book from returned books, POST:
+#### 1b. Lend - Add book from returned books, POST:
 		{	"id": String
             "title": String, 
 			"authors": String,
@@ -81,7 +84,9 @@
             headers: {'Content-Type': 'application/json'}
             }
 
-#### 1f. Books - Returned books, filter by Rating
+            Example URL: http://localhost:4000/books/global?volumeSearch=${siddharta}&authorSearch=${herman}
+
+#### 1f. Lend - Returned books, filter by Rating
             *Rating QUERYcan either be ASC or DESC
             var options = {
             method: 'GET',
@@ -91,9 +96,9 @@
             'Content-Type': 'application/json',
             Authorization: 'Bearer <token>' }
 
-            Example URL: http://localhost:4000/returned/filter?rating=desc
+            Example URL: http://localhost:4000/lend/returned/filter?rating=desc
 
-#### 1e. Books - My books, filter by Completion and/or Rating
+#### 1e. Me/Books - My books, filter by Completion and/or Rating
             * Rating query can either be ASC or DESC.
             * Completed query can either be true or false.
             var options = {
@@ -107,19 +112,19 @@
             Example URL: http://localhost:4000/username/books?completed=true&rating=desc
 
 
-### Users
-#### 2a. Users - Register - POST:
-		    "username": String,
-		    "email": String,
-		    "password": String,
-		    "activationCode": String
-
+### Auth
+#### 2a. Auth - Register - POST:
+		   {"username": "String",
+		    "email": "String",
+		    "password": "String",
+		    "activationCode": "String" 
+            }
             *Server will respond with your Token for Auth. Routes.
 
-#### 2b. Users - Login - POST:
-		    "username": String,
+#### 2b. Auth - Login - POST:
+		    {"username": String,
             "password": String,
-
+            }
             *Server will respond with your Token for Auth. Routes.
 
 ## C) Authorization

@@ -78,7 +78,7 @@ function Books() {
 
     axios
       .post(
-        "http://localhost:4000/users/lend",
+        "http://localhost:4000/lend",
         {
           title: title,
           authors: authors,

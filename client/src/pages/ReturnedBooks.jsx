@@ -32,7 +32,7 @@ function ReturnedBooks() {
 
   const getBooks = () => {
     axios
-      .get(`http://localhost:4000/returned`, {
+      .get(`http://localhost:4000/lend/returned`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -55,7 +55,7 @@ function ReturnedBooks() {
     }
     axios
       .post(
-        "http://localhost:4000/users/lend/returned",
+        "http://localhost:4000/lend",
         {
           id: id,
           title: title,
@@ -85,11 +85,14 @@ function ReturnedBooks() {
   const filterByRating = (ratingOrder) => {
     if (ratingOrder || typeof completionMode === "boolean") {
       axios
-        .get(`http://localhost:4000/returned/filter?rating=${ratingOrder}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
+        .get(
+          `http://localhost:4000/lend/returned/filter?rating=${ratingOrder}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
         .then(function (response) {
           console.log(response.data);
           setReturnedBooks(response.data);
@@ -187,7 +190,7 @@ function ReturnedBooks() {
                       <Text>{book.pages === 0 ? "" : book.pages}</Text>
                       <Text>{book.published}</Text>
                       <Text>
-                        {book.rating !== "0" ? `Rating: ${book.rating}` : ""}
+                        {book.rating !== 0 ? `Rating: ${book.rating}` : ""}
                       </Text>
                       <Text>{book.review && `Review: ${book.review}`}</Text>
                     </Box>

@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
+import { useRecoilValue } from "recoil";
+import { useNavigate } from "react-router-dom";
+
+import { userState, tokenState } from "../users/atom";
+
 import {
   Input,
   Button,
@@ -14,12 +19,6 @@ import {
 } from "@chakra-ui/react";
 import { GiReturnArrow } from "react-icons/gi";
 import { MdOutlineFileDownloadDone } from "react-icons/md";
-
-import { userState, tokenState } from "../users/atom";
-
-import { useRecoilValue } from "recoil";
-
-import { useNavigate } from "react-router-dom";
 
 function Account() {
   const navigate = useNavigate();
@@ -50,7 +49,7 @@ function Account() {
     setRatingOrder("");
 
     axios
-      .get(`http://localhost:4000/${user[0]}/books`, {
+      .get(`http://localhost:4000/me/${user[0]}/books`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -90,7 +89,7 @@ function Account() {
     console.log(id);
     axios
       .post(
-        `http://localhost:4000/users/return`,
+        `http://localhost:4000/lend/return`,
         { id: id },
         {
           headers: {
@@ -118,26 +117,18 @@ function Account() {
 
     if (editDone) {
       axios
-        .put(
-          `http://localhost:4000/books/${editByID}`,
-          {
-            title: bookToEdit[0].title,
-            authors: bookToEdit[0].authors,
-            pages: bookToEdit[0].pages,
-            published: bookToEdit[0].published,
-            completed: bookToEdit[0].completed,
-            review: review,
-            rating: Number(rating),
-            username: user[0],
-            activationCode: user[1],
-            image: bookToEdit[0].image,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        )
+        .put(`http://localhost:4000/books/${editByID}`, {
+          title: bookToEdit[0].title,
+          authors: bookToEdit[0].authors,
+          pages: bookToEdit[0].pages,
+          published: bookToEdit[0].published,
+          completed: bookToEdit[0].completed,
+          review: review,
+          rating: Number(rating),
+          username: user[0],
+          activationCode: user[1],
+          image: bookToEdit[0].image,
+        })
         .then((response) => {
           console.log(response);
           getBooks();
@@ -157,15 +148,7 @@ function Account() {
     const toggleComplete = toggle(completed);
 
     axios
-      .patch(
-        `http://localhost:4000/books/${id}`,
-        { completed: toggleComplete },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
+      .patch(`http://localhost:4000/books/${id}`, { completed: toggleComplete })
       .then((response) => {
         console.log(response.data);
         getBooks();
