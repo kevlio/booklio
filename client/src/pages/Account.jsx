@@ -68,7 +68,7 @@ function Account() {
       console.log("filter");
       axios
         .get(
-          `http://localhost:4000/${user[0]}/books?completed=${completionMode}&rating=${ratingOrder}`,
+          `http://localhost:4000/me/${user[0]}/books?completed=${completionMode}&rating=${ratingOrder}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

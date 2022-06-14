@@ -109,7 +109,7 @@ function ReturnedBooks() {
         <Text fontSize="2xl">Hey {user[0]}</Text>
         <Text fontSize="2xl">
           {bookAmount &&
-            `There is ${bookAmount} returned books available for free`}
+            `There are ${bookAmount} returned books available for free`}
         </Text>
         <Box display="flex" flexDirection="column" gap={2}>
           <Button
