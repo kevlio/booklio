@@ -103,13 +103,13 @@
             * Completed query can either be true or false.
             var options = {
             method: 'GET',
-            url: 'http://localhost:4000/username/books',
+            url: 'http://localhost:4000/me/username/books',
             params: {completed: 'true', rating: 'desc'},
             headers: {
             'Content-Type': 'application/json',
             Authorization: 'Authorization: 'Bearer <token>'}
 
-            Example URL: http://localhost:4000/username/books?completed=true&rating=desc
+            Example URL: http://localhost:4000/me/username/books?completed=true&rating=desc
 
 
 ### Auth
