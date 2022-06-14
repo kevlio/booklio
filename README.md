@@ -4,16 +4,15 @@
 1. URL: http://localhost:4000
 2. For Authorization see Section C.
 3. Content-type: JSON
-4. To access 
 
 ## A) Routes
 ### Books
     /books                  GET  
     /books                  POST (Section B.1a)
-    /books/global           GET  (Section B.1c)
+    /books/global           GET  (Section B.1d)
     /books/:id              GET, DELETE
     /books/:id              PUT   (Section B.1a)   AUTH
-    /books/:id              PATCH (Section B.1b)   AUTH
+    /books/:id              PATCH (Section B.1c)   AUTH
 
 ### Users
     /users                  GET     
@@ -24,12 +23,11 @@
 ### Books + Users
     /:username/books        GET   (Section B.1e)   AUTH
     /users/lend             POST  (Section B.1a)   AUTH 
-    /users/lend/returned    POST  (Section B.1a)   AUTH 
+    /users/lend/returned    POST  (Section B.1b)   AUTH 
     /users/return           POST  (Section B.1a)   AUTH 
     /returned               GET                    AUTH
-    /returned/filter        GET   (Section B.1d)   AUTH
+    /returned/filter        GET   (Section B.1f)   AUTH
     /me/:username           GET                    AUTH
-
 
 ## B) Object Structure and Datatypes
 ### Books
@@ -58,10 +56,24 @@
 			"review": "Very gut",
 			"completed": 1  }
 
-#### 1b. Books - PATCH (0 = uncompleted, 1 = completed):
+#### 1b. Books - Add book from returned books, POST:
+		{	"id": String
+            "title": String, 
+			"authors": String,
+			"pages": Number,
+			"published": String,
+			"image": String,
+			"username": String,
+			"activationCode": String,
+			"rating": Number,
+			"review": String,
+			"completed": Number 
+            (0 = uncompleted, 1 = completed)  }
+
+#### 1c. Books - PATCH (0 = uncompleted, 1 = completed):
     	    { "completed": 1 }
 
-#### 1c. Books - GET, global books:
+#### 1d. Books - GET, global books:
             var options = {
             method: 'GET',
             url: 'http://localhost:4000/books/global',
@@ -69,7 +81,7 @@
             headers: {'Content-Type': 'application/json'}
             }
 
-#### 1d. Books - Returned books, filter by Rating
+#### 1f. Books - Returned books, filter by Rating
             *Rating QUERYcan either be ASC or DESC
             var options = {
             method: 'GET',
@@ -93,6 +105,8 @@
             Authorization: 'Authorization: 'Bearer <token>'}
 
             Example URL: http://localhost:4000/username/books?completed=true&rating=desc
+
+
 ### Users
 #### 2a. Users - Register - POST:
 		    "username": String,

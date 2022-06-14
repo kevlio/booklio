@@ -80,7 +80,6 @@ function ReturnedBooks() {
 
   const filterByRating = (ratingOrder) => {
     if (ratingOrder || typeof completionMode === "boolean") {
-      console.log("filter");
       axios
         .get(`http://localhost:4000/returned/filter?rating=${ratingOrder}`, {
           headers: {
@@ -194,8 +193,8 @@ function ReturnedBooks() {
                       book.id,
                       book.title,
                       book.authors,
-                      book.pageCount,
-                      book.publishedDate,
+                      book.pages,
+                      book.published,
                       book.image
                     )
                   }

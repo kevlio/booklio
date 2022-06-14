@@ -125,6 +125,17 @@ function UserInfo() {
                 alignItems="center"
               >
                 <Box display="flex" flexDirection="column">
+                  <FormLabel>Email</FormLabel>
+                  <Input
+                    disabled
+                    type="text"
+                    placeholder="Email"
+                    defaultValue={currentUser.email}
+                    id={currentUser.email + "email"}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </Box>
+                <Box display="flex" flexDirection="column">
                   <FormLabel>Password</FormLabel>
                   <Input
                     disabled
@@ -133,17 +144,6 @@ function UserInfo() {
                     defaultValue={currentUser.password}
                     id={currentUser.password + "password"}
                     onChange={(e) => setPassword(e.target.value)}
-                  />
-                </Box>
-                <Box display="flex" flexDirection="column">
-                  <FormLabel>Password</FormLabel>
-                  <Input
-                    disabled
-                    type="text"
-                    placeholder="Email"
-                    defaultValue={currentUser.email}
-                    id={currentUser.email + "email"}
-                    onChange={(e) => setEmail(e.target.value)}
                   />
                 </Box>
               </Box>

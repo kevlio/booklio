@@ -26,6 +26,8 @@ function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
+  const [errorMessage, setErrorMessage] = useState("");
+
   const { isOpen, onToggle } = useDisclosure();
 
   const navigate = useNavigate();
@@ -46,6 +48,7 @@ function Login() {
       })
       .catch((error) => {
         console.log(error);
+        setErrorMessage(error.response.data.message);
         onToggle();
       });
   };
@@ -78,11 +81,15 @@ function Login() {
               type="text"
             ></Input>
             <Input
+              isRequired
               color="black"
               name="password"
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
               type="password"
+              onKeyPress={(e) => {
+                if (e.key === "Enter") login(username, password);
+              }}
             ></Input>
             <Button
               type="submit"
@@ -91,7 +98,7 @@ function Login() {
             >
               Login
             </Button>
-            <Fade in={isOpen}>
+            <Fade in={isOpen && errorMessage}>
               <Button
                 width="100%"
                 color="white"
@@ -99,7 +106,7 @@ function Login() {
                 rounded="md"
                 shadow="md"
               >
-                Incorrect username or password
+                {errorMessage}
               </Button>
             </Fade>
           </Stack>

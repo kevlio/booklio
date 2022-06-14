@@ -31,6 +31,9 @@ function SignUp() {
   const [username, setUsername] = useState("");
   const [activationCode, setActivationCode] = useState("");
 
+  const [socialNumber, setSocialNumber] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
   const activationCodeGenerator = () => {
     let r = (Math.random() + 1).toString(36).substring(7).toUpperCase();
     console.log(r);
@@ -55,6 +58,7 @@ function SignUp() {
       })
       .catch((error) => {
         console.log(error);
+        setErrorMessage(error.response.data.message);
         onToggle();
       });
   };
@@ -129,21 +133,33 @@ function SignUp() {
                   name="activation"
                   placeholder="Activation code"
                   type="text"
-                  defaultValue={activationCode}
                   onChange={(e) => setActivationCode(e.target.value)}
+                  onKeyPress={(e) => {
+                    if (e.key === "Enter")
+                      addUser(username, password, email, activationCode);
+                  }}
                 ></Input>
               </Box>
             </Box>
             <Button colorScheme="blue" onClick={() => onToggle()}>
               Don't have a activation code? Click here!
             </Button>
-            <Collapse in={isOpen}>
+            <Collapse in={isOpen && socialNumber.length === 0}>
               <Box display="flex">
-                <Input placeholder="Social security number" width="60%"></Input>
+                <Input
+                  isRequired
+                  placeholder="Social security number"
+                  width="60%"
+                  onChange={(e) => setSocialNumber(e.target.value)}
+                ></Input>
                 <Button
                   colorScheme="green"
                   width="40%"
-                  onClick={activationCodeGenerator}
+                  onClick={
+                    socialNumber
+                      ? activationCodeGenerator()
+                      : console.log("Enter social secury number")
+                  }
                 >
                   Get code
                 </Button>
@@ -158,11 +174,11 @@ function SignUp() {
             >
               Sign up
             </Button>
-            {/* <Collapse in={isOpen}>
+            <Collapse in={isOpen && errorMessage}>
               <Button bg="red" color="white" width="100%">
-                User already exist, please choose another one
+                {errorMessage}
               </Button>
-            </Collapse> */}
+            </Collapse>
             <Progress value={20} size="xs" colorScheme="pink" />
           </Stack>
         </Box>

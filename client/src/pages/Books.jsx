@@ -54,7 +54,6 @@ function Books() {
   const [showInfo, setShowInfo] = useState(true);
 
   const [addedBook, setAddedBook] = useState([]);
-  console.log(addedBook);
 
   const search = () => {
     setShowInfo(false);
@@ -72,7 +71,6 @@ function Books() {
 
   // POST
   const addBook = (title, authors, pages, published, image) => {
-    console.log(title, authors, pages, published, image);
     if (!logged) {
       onOpen();
       return;
@@ -125,11 +123,17 @@ function Books() {
           width="50%"
           onChange={(e) => setVolumeSearch(e.target.value)}
           placeholder="Search for books..."
+          onKeyPress={(e) => {
+            if (e.key === "Enter") search();
+          }}
         ></Input>
         <Input
           width="50%"
           onChange={(e) => setAuthorSearch(e.target.value)}
           placeholder="Author..."
+          onKeyPress={(e) => {
+            if (e.key === "Enter") search();
+          }}
         ></Input>
         <Button
           colorScheme="green"
@@ -286,14 +290,8 @@ function Books() {
               boxShadow="inner"
               mx={2}
               maxWidth="250px"
-              // height="350px"
             >
-              <Box
-                borderTopRadius="12px"
-                display="flex"
-                flexDir="column"
-                // backgroundColor="rgba(0, 0, 0, 0.8)"
-              >
+              <Box borderTopRadius="12px" display="flex" flexDir="column">
                 <Text fontSize="2xl" wordBreak="break-word">
                   {book.volumeInfo.title}
                 </Text>
@@ -382,10 +380,11 @@ function Books() {
                                 ? book.volumeInfo.imageLinks.thumbnail
                                 : ""
                             );
-                            // setAddedBook([]);
-                            setAddedBook((prevBooks) => {
-                              return [...prevBooks, book.id];
-                            });
+                            if (logged) {
+                              setAddedBook((prevBooks) => {
+                                return [...prevBooks, book.id];
+                              });
+                            }
                           }}
                         >
                           {addedBook.includes(book.id)

@@ -281,6 +281,7 @@ async function returnOneBook(req, res) {
   // const username = req.body.id;
   const id = req.body.id;
   console.log(id);
+  console.log(typeof id);
 
   if (!id)
     return res.status(400).json({ message: "Book ID is missing", status: 400 });
