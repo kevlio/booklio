@@ -195,6 +195,20 @@ function getReturnedBooks() {
   });
 }
 
+// GET AMOUNT RETURNED BOOKS
+function getReturnedBooksCount() {
+  const sql = "SELECT COUNT(*) FROM returned_books";
+  return new Promise((resolve, reject) => {
+    db.all(sql, (error, rows) => {
+      if (error) {
+        console.error(error.message);
+        reject(error);
+      }
+      resolve(rows);
+    });
+  });
+}
+
 // GE ALL RETURNED BOOKS BY RATING
 function getReturnedBooksFilterRating(ascDesc) {
   const sql = `SELECT * FROM returned_books ORDER BY rating ${ascDesc}`;
@@ -286,6 +300,7 @@ module.exports = {
   returnBook,
   getReturnedBooks,
   deleteReturnedBook,
+  getReturnedBooksCount,
   getReturnedBooksFilterRating,
   checkBookObject,
 };

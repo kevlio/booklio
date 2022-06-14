@@ -19,9 +19,12 @@ function ReturnedBooks() {
   const user = useRecoilValue(userState);
   const token = useRecoilValue(tokenState);
 
-  const [savedBooks, setSavedBooks] = useState([]);
-  const { isOpen, onToggle, onClose, onOpen } = useDisclosure();
+  const [returnedBooks, setReturnedBooks] = useState([]);
+  const [bookAmount, setBookAmount] = useState();
+
   const [completionMode, setCompletionMode] = useState("");
+
+  const { isOpen, onToggle, onClose, onOpen } = useDisclosure();
 
   useEffect(() => {
     getBooks();
@@ -36,7 +39,8 @@ function ReturnedBooks() {
       })
       .then(function (response) {
         console.log(response.data);
-        setSavedBooks(response.data);
+        setReturnedBooks(response.data.result);
+        setBookAmount(response.data.amount);
       })
       .catch(function (error) {
         console.error(error);
@@ -88,7 +92,7 @@ function ReturnedBooks() {
         })
         .then(function (response) {
           console.log(response.data);
-          setSavedBooks(response.data);
+          setReturnedBooks(response.data);
         })
         .catch(function (error) {
           console.error(error);
@@ -100,6 +104,10 @@ function ReturnedBooks() {
     <div>
       <Center display="flex" flexDir="column">
         <Text fontSize="2xl">Hey {user[0]}</Text>
+        <Text fontSize="2xl">
+          {bookAmount &&
+            `There is ${bookAmount} returned books available for free`}
+        </Text>
         <Box display="flex" flexDirection="column" gap={2}>
           <Button
             variant="outline"
@@ -134,8 +142,8 @@ function ReturnedBooks() {
           spacing={8}
           my={4}
         >
-          {savedBooks &&
-            savedBooks.map((book) => (
+          {returnedBooks &&
+            returnedBooks.map((book) => (
               <Box
                 key={book.id}
                 backgroundImage={book.image}

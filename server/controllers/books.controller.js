@@ -303,8 +303,10 @@ async function returnOneBook(req, res) {
 
 // GET ALL RETURNED BOOKS
 async function getAllReturnedBooks(req, res) {
+  const count = await books.getReturnedBooksCount();
+  const amount = count[0]["COUNT(*)"];
   const result = await books.getReturnedBooks();
-  res.status(200).json(result);
+  res.status(200).json({ amount, result });
 }
 
 // GE ALL RETURNED BOOKS BY RATING
